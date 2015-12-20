@@ -1,7 +1,13 @@
 module.exports = function(grunt) {
   grunt.initConfig({
+    clean: {
+      js:   ['public/js'],
+      html: ['public/**/*.html'],
+      css:  ['public/css', '.sass-cache'],
+      map:  ['**/*.map']
+    },
     jshint: {
-      files: ['js/*.js'],
+      files: ['public/js/*.js'],
       options: {
         esnext: true,
         globals: {
@@ -9,39 +15,19 @@ module.exports = function(grunt) {
         }
       }
     },
-    watch: {
-      coffee: {
-        files: ['src/coffee/*.coffee'],
-        tasks: ['coffee:compile']
-      },
-      scripts: {
-        files: ['*.js'],
-        tasks: ['jshint']
-      },
-      haml: {
-        files: ['src/haml/**/*.haml'],
-        tasks: ['haml:compile']
-      }
-    },
     coffee: {
       compile: {
         options: {
           sourceMap: true,
-          sourceMapDir: 'js'
+          sourceMapDir: 'public/js'
         },
         expand:  true,
         flatten: true,
         cwd:     'src/coffee',
         src:     ['*.coffee'],
-        dest:    'js',
+        dest:    'public/js',
         ext:     '.js'
       }
-    },
-    clean: {
-      js:   ['js'],
-      html: ['*.html'],
-      css:  ['public/app.css'],
-      map:  ['**/*.map']
     },
     haml: {
       compile: {
@@ -50,7 +36,7 @@ module.exports = function(grunt) {
             expand: true,
             cwd:   'src/haml',
             src:   '**/*.haml',
-            dest:  '.',
+            dest:  'public',
             ext :  '.html'
           }
         ]
@@ -62,11 +48,29 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: 'src/styles',
-            src: ['app.scss'],
-            dest: 'public',
+            src: ['**/*.scss'],
+            dest: 'public/css',
             ext: '.css'
           }
         ]
+      }
+    },
+    watch: {
+      coffee: {
+        files: ['src/coffee/**/*.coffee'],
+        tasks: ['coffee']
+      },
+      haml: {
+        files: ['src/haml/**/*.haml'],
+        tasks: ['haml']
+      },
+      sass: {
+        files: ['src/styles/**/*.scss'],
+        tasks: ['sass']
+      },
+      scripts: {
+        files: ['public/js/**/*.js', 'Gruntfile.js'],
+        tasks: ['jshint']
       }
     }
   });
@@ -78,5 +82,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-haml2html');
 
-  grunt.registerTask('default', ['coffee', 'jshint', 'haml:compile', 'sass']);
+  grunt.registerTask('default', ['coffee', 'jshint', 'haml', 'sass']);
 };
