@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     jshint: {
-      files: ["*.js"],
+      files: ['js/*.js'],
       options: {
         esnext: true,
         globals: {
@@ -11,31 +11,63 @@ module.exports = function(grunt) {
     },
     watch: {
       coffee: {
-        files: ["*.coffee"],
-        tasks: ["coffee"]
+        files: ['src/coffee/*.coffee'],
+        tasks: ['coffee:compile']
       },
       scripts: {
-        files: ["*.js"],
-        tasks: ["jshint"]
+        files: ['*.js'],
+        tasks: ['jshint']
+      },
+      haml: {
+        files: ['src/haml/**/*.haml'],
+        tasks: ['haml:compile']
       }
     },
     coffee: {
-      glob_to_multiple: {
+      compile: {
         options: {
           sourceMap: true,
-          sourceMapDir: '.'
+          sourceMapDir: 'js'
         },
         expand:  true,
         flatten: true,
-        cwd:     '.',
+        cwd:     'src/coffee',
         src:     ['*.coffee'],
-        dest:    '.',
+        dest:    'js',
         ext:     '.js'
       }
     },
     clean: {
-      js:  ["./*.js", "!./Gruntfile.js"],
-      map: ["./*.map"]
+      js:   ['js'],
+      html: ['*.html'],
+      css:  ['public/app.css'],
+      map:  ['**/*.map']
+    },
+    haml: {
+      compile: {
+        files: [
+          { 
+            expand: true,
+            cwd:   'src/haml',
+            src:   '**/*.haml',
+            dest:  '.',
+            ext :  '.html'
+          }
+        ]
+      }
+    },
+    sass: {
+      dist: {
+        files: [
+          {
+            expand: true,
+            cwd: 'src/styles',
+            src: ['app.scss'],
+            dest: 'public',
+            ext: '.css'
+          }
+        ]
+      }
     }
   });
 
@@ -43,6 +75,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-sass');
+  grunt.loadNpmTasks('grunt-haml2html');
 
-  grunt.registerTask("default", ["coffee", "jshint"]);
+  grunt.registerTask('default', ['coffee', 'jshint', 'haml:compile', 'sass']);
 };
